@@ -2320,18 +2320,28 @@
         return { intro: [], rest: blocks };
       }
 
-      function pickAutoTitle(block) {
+      function leadingLines(block) {
         const leads = [];
         for (const line of block) {
           if (parsePriceLines(line).length) break;
           leads.push(line);
         }
-        if (!leads.length) return null;
-        const hinted = leads.find((line) => {
+        return leads;
+      }
+
+      function findHintedTitle(leads) {
+        return leads.find((line) => {
+          if (isSectionTitle(line)) return false;
+          if (/^\s*--/.test(line)) return false;
           const clean = cleanNote(line);
           return TITLE_HINT.test(clean) || CLASS_NAMES.test(clean);
         });
-        return hinted || leads[0];
+      }
+
+      function pickAutoTitle(block) {
+        const leads = leadingLines(block);
+        if (!leads.length) return null;
+        return findHintedTitle(leads) || leads[0];
       }
 
       function parseRawPriceText(text) {
@@ -2341,14 +2351,21 @@
         for (const block of rest) {
           let current = null;
           let headerUsed = false;
-          const hasMarkedTitle = block.some(isSectionTitle);
-          const autoTitle = hasMarkedTitle ? null : pickAutoTitle(block);
+          const markedCount = block.filter(isSectionTitle).length;
+          const leads = leadingLines(block);
+          const hinted = markedCount <= 1 ? findHintedTitle(leads) : undefined;
+          const hasMarkedTitle = markedCount > 0 && !hinted;
+          const autoTitle = hasMarkedTitle ? null : hinted || (markedCount ? null : leads[0]) || null;
           const pending = [];
 
           for (const line of block) {
             if (isSectionTitle(line)) {
               const title = cleanTitle(line);
               if (!title) continue;
+              if (!headerUsed && autoTitle !== null) {
+                pending.push(line);
+                continue;
+              }
               commit();
               current = createSection(title);
               headerUsed = true;
