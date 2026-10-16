@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="나리상점 나리꽃 로고">
+  <defs>
+    <radialGradient id="sky" cx="0.5" cy="0.38" r="0.72">
+      <stop offset="0" stop-color="#fffdfa" />
+      <stop offset="0.6" stop-color="#fdeef3" />
+      <stop offset="1" stop-color="#f7dfe8" />
+    </radialGradient>
+    <linearGradient id="petal" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="0.45" stop-color="#fcdbe5" />
+      <stop offset="1" stop-color="#f2a9c0" />
+    </linearGradient>
+    <linearGradient id="petalBack" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#fdeaf0" />
+      <stop offset="1" stop-color="#eb9ab5" />
+    </linearGradient>
+    <linearGradient id="stem" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9ec5a6" />
+      <stop offset="1" stop-color="#6fa37d" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="80" cy="80" r="80" fill="url(#sky)" />
+
+  <!-- 줄기와 잎 -->
+  <path d="M80 150 C78 122 79 108 80 96" fill="none" stroke="url(#stem)" stroke-width="5" stroke-linecap="round" />
+  <path d="M80 128 C62 126 52 116 50 104 C64 104 76 113 80 128 Z" fill="#a8cdaf" opacity="0.95" />
+  <path d="M80 118 C98 117 109 108 112 96 C98 95 85 104 80 118 Z" fill="#8fbd99" opacity="0.95" />
+
+  <!-- 뒤쪽 꽃잎 -->
+  <g transform="translate(80 74)">
+    <ellipse cx="0" cy="-30" rx="13" ry="31" fill="url(#petalBack)" transform="rotate(36)" />
+    <ellipse cx="0" cy="-30" rx="13" ry="31" fill="url(#petalBack)" transform="rotate(108)" />
+    <ellipse cx="0" cy="-30" rx="13" ry="31" fill="url(#petalBack)" transform="rotate(180)" />
+    <ellipse cx="0" cy="-30" rx="13" ry="31" fill="url(#petalBack)" transform="rotate(252)" />
+    <ellipse cx="0" cy="-30" rx="13" ry="31" fill="url(#petalBack)" transform="rotate(324)" />
+  </g>
+
+  <!-- 앞쪽 꽃잎 -->
+  <g transform="translate(80 74)">
+    <ellipse cx="0" cy="-28" rx="14" ry="29" fill="url(#petal)" />
+    <ellipse cx="0" cy="-28" rx="14" ry="29" fill="url(#petal)" transform="rotate(72)" />
+    <ellipse cx="0" cy="-28" rx="14" ry="29" fill="url(#petal)" transform="rotate(144)" />
+    <ellipse cx="0" cy="-28" rx="14" ry="29" fill="url(#petal)" transform="rotate(216)" />
+    <ellipse cx="0" cy="-28" rx="14" ry="29" fill="url(#petal)" transform="rotate(288)" />
+  </g>
+
+  <!-- 꽃잎 결 -->
+  <g transform="translate(80 74)" stroke="#e58fa8" stroke-width="1.6" stroke-linecap="round" opacity="0.5" fill="none">
+    <path d="M0 -8 L0 -44" />
+    <path d="M0 -8 L0 -44" transform="rotate(72)" />
+    <path d="M0 -8 L0 -44" transform="rotate(144)" />
+    <path d="M0 -8 L0 -44" transform="rotate(216)" />
+    <path d="M0 -8 L0 -44" transform="rotate(288)" />
+  </g>
+
+  <!-- 수술 -->
+  <g transform="translate(80 74)">
+    <g stroke="#e8c89a" stroke-width="2.4" stroke-linecap="round">
+      <path d="M0 0 L-9 -13" />
+      <path d="M0 0 L9 -13" />
+      <path d="M0 0 L0 -16" />
+      <path d="M0 0 L-13 -5" />
+      <path d="M0 0 L13 -5" />
+    </g>
+    <circle cx="-9" cy="-14" r="2.6" fill="#d9a65f" />
+    <circle cx="9" cy="-14" r="2.6" fill="#d9a65f" />
+    <circle cx="0" cy="-17" r="2.6" fill="#d9a65f" />
+    <circle cx="-14" cy="-5" r="2.6" fill="#d9a65f" />
+    <circle cx="14" cy="-5" r="2.6" fill="#d9a65f" />
+    <circle cx="0" cy="0" r="5" fill="#f6c9d8" />
+  </g>
+
+  <!-- 흩날리는 꽃잎 -->
+  <ellipse cx="32" cy="46" rx="6" ry="4" fill="#f7c6d4" opacity="0.85" transform="rotate(-28 32 46)" />
+  <ellipse cx="126" cy="58" rx="5.5" ry="3.6" fill="#f7c6d4" opacity="0.75" transform="rotate(22 126 58)" />
+  <ellipse cx="116" cy="132" rx="5" ry="3.2" fill="#f7c6d4" opacity="0.6" transform="rotate(-14 116 132)" />
+</svg>
