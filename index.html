@@ -1563,6 +1563,8 @@
       const EMOJI_ALL = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{2764}\u{2B50}]/gu;
       const EMOJI_START = /^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{2764}\u{2B50}]/u;
 
+      const CLASS_NAMES = /강령|네크로|악마술사|소서|마법사|원소술사|야만|바바|도적|로그|드루이드|드루|정령사|성전사|팔라딘|어쌔신|스핀|조폭/;
+
       const defaultSiteSettings = {
         kakaoOneUrl: ""
       };
@@ -2323,6 +2325,8 @@
 
         for (const block of rest) {
           let current = null;
+          let headerUsed = false;
+          const hasMarkedTitle = block.some(isSectionTitle);
 
           for (const line of block) {
             if (isSectionTitle(line)) {
@@ -2330,6 +2334,7 @@
               if (!title) continue;
               commit();
               current = createSection(title);
+              headerUsed = true;
               continue;
             }
 
@@ -2342,8 +2347,15 @@
 
             const note = cleanNote(line);
             if (!note) continue;
-            if (!current) current = createSection("안내");
-            if (!current.subtitle && !current.items.length) current.subtitle = note;
+
+            if (!hasMarkedTitle && !headerUsed && !current) {
+              current = createSection(note);
+              headerUsed = true;
+              continue;
+            }
+
+            if (!current) current = createSection(note);
+            else if (!current.subtitle && !current.items.length) current.subtitle = note;
             else current.notes.push(note);
           }
 
@@ -2351,7 +2363,12 @@
 
           function commit() {
             if (!current) return;
-            if (current.items.length || current.subtitle || current.notes.length) sections.push(current);
+            if (current.items.length || current.subtitle || current.notes.length) {
+              if (!current.category || current.category === "기타") {
+                current.category = inferCategory(`${current.title} ${current.items.map((i) => i[0]).join(" ")}`);
+              }
+              sections.push(current);
+            }
             current = null;
           }
         }
@@ -2494,6 +2511,7 @@
       }
 
       function inferCategory(title) {
+        if (CLASS_NAMES.test(title) || /클래스\s*(풀)?세트|풀세트|풀세팅|\d+\s*종/.test(title)) return "클래스 세트";
         if (/버스|대행|런|렙업|정복자|여정|캠페인|세팅|메피스토|공물|우버|보스/.test(title)) return "대행";
         if (/골드|금화/.test(title)) return "재화";
         if (/보석|호라드림|분광경|십자가|엔트|공격|숙련|다채|풍족|보호|실용/.test(title)) return "보석";
