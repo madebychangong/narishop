@@ -1563,7 +1563,8 @@
       const EMOJI_ALL = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{2764}\u{2B50}]/gu;
       const EMOJI_START = /^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{2764}\u{2B50}]/u;
 
-      const CLASS_NAMES = /강령|네크로|악마술사|소서|마법사|원소술사|야만|바바|도적|로그|드루이드|드루|정령사|성전사|팔라딘|어쌔신|스핀|조폭/;
+      const CLASS_NAMES = /강령|강술|네크로|악마술사|악술|소서|마법사|원소술사|원술|야만|바바|도적|로그|드루이드|드루|정령사|정령|성기사|성전사|팔라딘|어쌔신|스핀|조폭/;
+      const TITLE_HINT = /\d+\s*종|위력/;
 
       const defaultSiteSettings = {
         kakaoOneUrl: ""
@@ -2319,6 +2320,20 @@
         return { intro: [], rest: blocks };
       }
 
+      function pickAutoTitle(block) {
+        const leads = [];
+        for (const line of block) {
+          if (parsePriceLines(line).length) break;
+          leads.push(line);
+        }
+        if (!leads.length) return null;
+        const hinted = leads.find((line) => {
+          const clean = cleanNote(line);
+          return TITLE_HINT.test(clean) || CLASS_NAMES.test(clean);
+        });
+        return hinted || leads[0];
+      }
+
       function parseRawPriceText(text) {
         const sections = [];
         const { rest } = splitIntro(splitBlocks(text));
@@ -2327,6 +2342,8 @@
           let current = null;
           let headerUsed = false;
           const hasMarkedTitle = block.some(isSectionTitle);
+          const autoTitle = hasMarkedTitle ? null : pickAutoTitle(block);
+          const pending = [];
 
           for (const line of block) {
             if (isSectionTitle(line)) {
@@ -2335,12 +2352,17 @@
               commit();
               current = createSection(title);
               headerUsed = true;
+              flushPending();
               continue;
             }
 
             const rows = parsePriceLines(line);
             if (rows.length) {
-              if (!current) current = createSection("기타 상품");
+              if (!current) {
+                current = createSection(pending.length ? cleanTitle(pending.shift()) : "기타 상품");
+                headerUsed = true;
+                flushPending();
+              }
               current.items.push(...rows);
               continue;
             }
@@ -2348,18 +2370,39 @@
             const note = cleanNote(line);
             if (!note) continue;
 
-            if (!hasMarkedTitle && !headerUsed && !current) {
+            if (!headerUsed && autoTitle !== null) {
+              if (line === autoTitle) {
+                commit();
+                current = createSection(cleanTitle(line));
+                headerUsed = true;
+                flushPending();
+              } else {
+                pending.push(line);
+              }
+              continue;
+            }
+
+            if (!current) {
               current = createSection(note);
               headerUsed = true;
               continue;
             }
 
-            if (!current) current = createSection(note);
-            else if (!current.subtitle && !current.items.length) current.subtitle = note;
+            addNote(note);
+          }
+
+          flushPending();
+          commit();
+
+          function addNote(note) {
+            if (!current.subtitle && !current.items.length) current.subtitle = note;
             else current.notes.push(note);
           }
 
-          commit();
+          function flushPending() {
+            if (!current) return;
+            while (pending.length) addNote(cleanNote(pending.shift()));
+          }
 
           function commit() {
             if (!current) return;
